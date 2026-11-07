@@ -22,15 +22,28 @@ The mailbox owner grants permission through Google. The saved authorization is p
 
 MFA means multi-factor authentication: an extra verification step beyond the initial sign-in. In this case, that step uses an emailed code.
 
+## Tools Used and What They Do
+
+| Tool or service | What it does | Where it fits |
+| --- | --- | --- |
+| Gmail API | Enumerate and retrieve candidate verification messages. | Actual direct-access integration, not a dependency on the failed Logic Apps connector. |
+| Google OAuth 2.0 | Authorize the established mailbox and support credential renewal. | Actual authorization protocol; the local fixtures do not repeat consent. |
+| Azure Key Vault and managed identity | Protect and retrieve the selected Google authorization material. | Actual credential boundary; no tokens or codes are included. |
+| Azure Functions, Node.js and TypeScript | Bound lookup work, validate candidate metadata and coordinate the recovery request. | Selected actual implementation; local tests use fake provider responses. |
+| Playwright and Chromium | Handle the provider browser sign-in and consume the accepted code command. | Downstream worker context; this repository does not run a real provider reconnect. |
+| Node test runner and Python | Run transport/parser checks and the local explanatory preview. | Public local validation, separate from live inbox or browser acceptance. |
+
+The Gmail API retrieves a candidate message; it does not by itself complete provider sign-in. Mailbox identity, browser challenge, freshness, ambiguity and saved session remain separate checks.
+
 ## Step by Step
 
 A short walkthrough of the process, with technical instructions and evidence limits in the sections below.
 
-1. **Authorize the intended inbox** — The mailbox owner grants permission through Google. The application stores that authorization securely and confirms the mailbox account before reading.
+1. **Authorize the intended inbox (Google OAuth 2.0)** — The mailbox owner grants permission through Google. The application stores that authorization securely and confirms the mailbox account before reading.
 
-2. **Look for the current code** — A reconnect attempt searches a limited set of recent messages. Sender checks, message timing and competing emails help determine whether one code is suitable.
+2. **Look for the current code (Gmail API)** — A reconnect attempt searches a limited set of recent messages. Sender checks, message timing and competing emails help determine whether one code is suitable.
 
-3. **Complete the sign-in securely** — The application prevents reuse and protects the code before passing it to the sign-in component. It confirms access to protected provider pages before saving the session.
+3. **Complete the sign-in securely (Playwright worker)** — The application prevents reuse and protects the code before passing it to the sign-in component. It confirms access to protected provider pages before saving the session.
 
 4. **Use manual help when needed** — An expired or unclear result falls back to manual entry instead of guessing. Reusing an already valid saved sign-in is tracked separately from completing a new email challenge.
 
