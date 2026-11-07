@@ -2,7 +2,7 @@
 
 **Help restore a business connection using the right email verification code, with manual help when needed.**
 
-[Business problem](#the-business-problem) · [Solution](#the-solution) · [Conclusions](#why-direct-gmail-access) · [Proof](#proof-it-works) · [Commands](docs/COMMANDS.md)
+[Business problem](#the-business-problem) · [Solution](#the-solution) · [Conclusions](#why-direct-gmail-access) · [Proof](#proof-it-works) · [Commands](docs/COMMANDS.md) · [Step by step](#step-by-step)
 
 ![Gmail access project local reference](docs/images/01-overview.png)
 
@@ -21,6 +21,18 @@ The mailbox owner grants permission through Google. The saved authorization is p
 **Business outcome:** The platform has a controlled way to recover the connection without depending entirely on staff watching the inbox. It still needs manual help in some cases.
 
 MFA means multi-factor authentication: an extra verification step beyond the initial sign-in. In this case, that step uses an emailed code.
+
+## Step by Step
+
+A short walkthrough of the process, with technical instructions and evidence limits in the sections below.
+
+1. **Authorize the intended inbox** — The mailbox owner grants permission through Google. The application stores that authorization securely and confirms the mailbox account before reading.
+
+2. **Look for the current code** — A reconnect attempt searches a limited set of recent messages. Sender checks, message timing and competing emails help determine whether one code is suitable.
+
+3. **Complete the sign-in securely** — The application prevents reuse and protects the code before passing it to the sign-in component. It confirms access to protected provider pages before saving the session.
+
+4. **Use manual help when needed** — An expired or unclear result falls back to manual entry instead of guessing. Reusing an already valid saved sign-in is tracked separately from completing a new email challenge.
 
 ## Architecture
 
