@@ -1,6 +1,6 @@
 # Gmail API Access and Provider MFA Recovery
 
-**Read an authorized inbox safely and use a verified email code to recover a business connection.**
+**Help restore a business connection using the right email verification code, with manual help when needed.**
 
 [Business problem](#the-business-problem) · [Solution](#the-solution) · [Conclusions](#why-direct-gmail-access) · [Proof](#proof-it-works) · [Commands](docs/COMMANDS.md)
 
@@ -8,49 +8,57 @@
 
 ## The Business Problem
 
-A business-report connection could require an emailed verification code after its saved session stopped working. Staff then had to notice the failure and reconnect. A reliable helper needed to read the intended inbox, avoid old or competing messages and keep codes and credentials out of logs.
+The platform imports reports from an external business service. Sometimes its saved sign-in stops working and the service emails a verification code. Staff then have to notice the failure and reconnect.
+
+Automating that step requires care: an older code, a message for another account or a code from a separate browser sign-in could be the wrong one.
 
 ## The Solution
 
-After an Azure custom-connector attempt failed during creation, use the direct Gmail API with the existing approved Google OAuth application. Keep authorization material in Azure Key Vault, check the actual mailbox before reading messages and check that each possible code belongs to the current reconnect attempt. The full application verifies the message, allows the code to be used once and encrypts it before passing it to the browser worker. It saves the session only after confirming access to protected provider pages.
+I used Google's Gmail API—the supported interface for programs to read Gmail—to check an authorized inbox. The application verifies the account and message, then passes a suitable code securely to the component handling the sign-in.
 
-**Business outcome:** The platform gained a controlled recovery path with manual fallback rather than relying on repeated staff inbox checks or an unproven connector retry. This does not promise permanent provider sessions or unattended recovery from every failure.
+The mailbox owner grants permission through Google. The saved authorization is protected in Azure Key Vault, a service for storing secrets. When messages are unclear or the request has expired, the process falls back to manual entry.
+
+**Business outcome:** The platform has a controlled way to recover the connection without depending entirely on staff watching the inbox. It still needs manual help in some cases.
+
+MFA means multi-factor authentication: an extra verification step beyond the initial sign-in. In this case, that step uses an emailed code.
 
 ## Architecture
 
 ```mermaid
 flowchart LR
-  Consent[Owner authorizes intended Gmail inbox] --> Vault[Protected authorization in Key Vault]
-  API[API lookup timer and request state] --> Vault
-  Vault --> OAuth[Refresh short-lived access token]
-  OAuth --> Gmail[Verify account and read bounded Gmail results]
-  Gmail --> Verify[Verify sender, recipient, template and time]
-  Verify --> Claim[Atomic SQL claim and encrypted command]
-  Claim --> Worker[Private browser worker]
-  Worker --> Session[Verify access and save session]
-  Verify -->|Uncertain or expired| Manual[Manual reconnect]
+  Owner[Owner authorizes the inbox] --> Permission[Store permission securely]
+  Reconnect[Start a reconnect attempt] --> Inbox[Check the intended inbox]
+  Permission --> Inbox
+  Inbox --> Message[Check the message and its timing]
+  Message -->|One suitable message| SignIn[Use the code securely]
+  SignIn --> Confirm[Confirm access and save the sign-in]
+  Message -->|Unclear or expired| Manual[Ask for manual entry]
 ```
-
-The API owns lookup and request state; the worker owns provider navigation and session storage. This direct Gmail implementation does **not** depend on a deployed Logic App or Azure Gmail connector.
 
 ## What Was Built
 
-| Component | Purpose | Code |
+| Part | What it does | Details |
 | --- | --- | --- |
-| Restricted Gmail API client | Restrict endpoints, response size, redirects, deadlines, scope and mailbox identity | [Transport](src/gmailTransport.ts) |
-| Reconnect request checks | Permit only a current, verified request with time and pagination limits | [Planner](src/mailbox/mailbox-plan.js) |
-| Message discovery and selection | Finish bounded discovery, reject duplicate IDs and ambiguous or untrusted messages | [Enumeration](src/mailbox/enumerate-mail.js), [selection](src/mailbox/mailbox-candidate.js) |
-| Email timing correction | Compare request and message times at their available whole-second precision | [Timing rule](src/mailbox/candidate-binding.js) |
-| Message verification and secure storage | Verify raw email, read Key Vault, atomically claim and submit an encrypted command | [Verifier](reference/gmailMessage.ts), [lookup](reference/gmailLookup.ts), [store](reference/gmailLookupStore.ts) |
-| Retained failed connector definition | Explain the attempted approach without activating it | [Historical Terraform](infra/connector-history/main.tf) |
+| Gmail connection | Reads only approved Google service addresses and checks the mailbox account. | [Connection code](src/gmailTransport.ts) |
+| Message selection | Limits the search and rejects old, duplicate or competing messages. | [Selection rules](src/mailbox/mailbox-candidate.js) |
+| Timing correction | Handles an email time rounded to whole seconds without generally allowing older codes. | [Timing rules](src/mailbox/candidate-binding.js) |
+| Protected code handling | Verifies the email, prevents reuse and encrypts the code before handing it over. | [Verification](reference/gmailMessage.ts) and [storage](reference/gmailLookupStore.ts) |
+| Manual fallback | Leaves uncertain cases for a person instead of guessing. | [Operating guide](docs/OPERATIONS-AND-SCALING.md) |
 
 ## Why Direct Gmail Access?
 
-The connector definition passed validation, but Azure returned HTTP 500 while creating the resource, before sign-in or mailbox access. No actionable service root cause was established. A support request was accepted asynchronously and then failed eligibility checks; that was not an opened support case.
+An earlier attempt used an Azure connector, a service that links applications. Its definition passed validation, but Azure returned HTTP 500 while creating it, before mailbox access could begin. The underlying service cause was not established.
 
-Direct API retrieval removed that connector dependency for MFA. It added responsibility for OAuth refresh, account checking, email parsing, message verification and ambiguity handling. The [original Logic Apps ingestion project](https://github.com/truthofsource/azure-logic-apps-document-ingestion) remains a separate workload. Reusing a Google project does not share permissions or prove that both integrations work.
+Direct Gmail access avoided that connector for the sign-in recovery process. It did not fix the separate [email document-ingestion project](https://github.com/truthofsource/azure-logic-apps-document-ingestion). Reusing the same Google project does not share mailbox permissions or prove both integrations work.
 
 ## Proof It Works
+
+**27 recorded local tests passed** using fictional emails and simulated Google responses. They checked the account restrictions, search limits and message-selection rules.
+
+Historical operating records also describe a corrected reconnect and reuse of the saved sign-in. The local examples do not repeat a real mailbox connection or live sign-in. [Results and limits](docs/VALIDATION.md).
+
+<details>
+<summary>For engineers: detailed results, examples and commands</summary>
 
 ### 1. Run local transport and selection checks
 
@@ -77,15 +85,18 @@ python -B scripts/preview.py --port 8141
 
 Open [the local reference](http://127.0.0.1:8141). No real messages, codes, OAuth credentials or account data are displayed. [Validation](docs/VALIDATION.md) separates local checks from dated platform acceptance.
 
+</details>
+
 ## Strengths, Weaknesses and Tradeoffs
 
-| Choice | Strength | Limitation |
-| --- | --- | --- |
-| Direct Gmail API | Avoids the failed Azure connector dependency | The application must own token refresh and API failure handling |
-| Read-only scope | Prevents message edits and sends through this authorization | The permission can still read the authorized mailbox broadly; application filters do not narrow the OAuth scope |
-| Verified single candidate | Reduces stale-message and wrong-code selection | External emails lack a unique application request ID; some cases require manual help |
-| One claim and encrypted command | Prevents reuse and keeps the code out of persisted plaintext | The database, request ownership and worker encryption keys must stay in sync |
-| Bounded attempts and fallback | Avoids resend loops and excessive sign-in attempts | Staff may still need to reconnect after an expired or failed attempt |
+| Benefit | What still needs attention |
+| --- | --- |
+| Avoids the failed connector dependency | The application must handle permission renewal and Google service errors. |
+| Does not edit or send email through this permission | Read-only access still allows the application to read the authorized mailbox. |
+| Rejects unclear messages | Two suitable messages may require manual entry, even if they contain the same code. |
+| Protects codes and prevents reuse | The database, encryption keys and sign-in component must work together. |
+
+For more accounts or more frequent reconnects, measure delays, service limits and manual fallbacks first. Keep each account's requests separate. [Growth and operations](docs/OPERATIONS-AND-SCALING.md).
 
 ## Guides
 
