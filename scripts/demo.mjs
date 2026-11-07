@@ -1,0 +1,12 @@
+import {receivedAfterConfirmedSend} from '../src/mailbox/candidate-binding.js';
+import {planMailboxLookup} from '../src/mailbox/mailbox-plan.js';
+import {selectMailboxCandidate} from '../src/mailbox/mailbox-candidate.js';
+import {gmailLookupDiagnostic} from '../src/gmailLookupDiagnostics.ts';
+const now=1700000001000,sent=1700000000456;
+const config={enabled:true,provider:'gmail',profileVerified:true,profileRevision:'v1',mailboxRef:'fictional'};
+const attempt={state:'enter_code',commandPending:false,interactive:true,leaseVerified:true,singleActiveAttempt:true,requestId:'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa',challengeId:'bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb',sendGeneration:'send1',credentialVersion:'v1',sentAtMs:sent,sessionExpiresMs:now+250000,leaseExpiresMs:now+900000};
+const plan=planMailboxLookup(config,attempt,now),profile={revision:'v1',prefix:'DEMO ',suffix:' END',digits:6};
+const message={id:'fictional1',receivedAtMs:now,previouslyClaimed:false,trustedEvidence:{mailboxRef:'fictional',profileRevision:'v1',authenticatedSender:true,recipientMatches:true,accountCorrelation:true},payload:{mimeType:'text/plain',body:{data:Buffer.from('DEMO 123456 END').toString('base64url')}}};
+const select=messages=>selectMailboxCandidate(plan,profile,{complete:true,pages:1,messages},now);
+const results=[['Eligible request','Ready',String(plan.ok)],['One internally verified message','Candidate only',String(select([message]).ok)],['Two competing messages','Manual fallback',select([message,{...message,id:'fictional2'}]).reason],['Previously claimed message','Not reused',select([{...message,previouslyClaimed:true}]).reason],['Arrival rounded to Send second','Allowed timing bucket',String(receivedAfterConfirmedSend(1700000000000,sent))],['Older precise arrival','Rejected',String(!receivedAfterConfirmedSend(sent-1,sent))],['Unexpected error text','Safe diagnostic',gmailLookupDiagnostic('private arbitrary details')]];
+console.log(JSON.stringify({results,scope:'Internal decisions with fictional messages. No actual OAuth, DKIM verification, database claim, code submission or browser sign-in.'}));

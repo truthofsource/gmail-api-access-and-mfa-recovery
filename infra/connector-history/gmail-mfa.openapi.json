@@ -1,0 +1,267 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "Provider MFA Gmail read-only foundation",
+    "version": "0.1.0",
+    "description": "Uncommissioned MFA contract. Bounded message list/get only; no attachment retrieval or mailbox writes."
+  },
+  "host": "gmail.googleapis.com",
+  "basePath": "/gmail/v1",
+  "schemes": [
+    "https"
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {
+    "/users/{userId}/messages": {
+      "get": {
+        "operationId": "ListMessages",
+        "summary": "List Gmail messages",
+        "description": "Read only for an eligible bounded MFA attempt. Query and mailbox are resolved by trusted configuration.",
+        "x-ms-summary": "List messages",
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "x-ms-summary": "User",
+            "description": "Only the authenticated mailbox.",
+            "enum": [
+              "me"
+            ]
+          },
+          {
+            "name": "q",
+            "in": "query",
+            "required": true,
+            "type": "string",
+            "x-ms-summary": "Gmail query",
+            "description": "Fixed privately configured sender/recipient and epoch bounds. Never require attachments or unread status."
+          },
+          {
+            "name": "pageToken",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "x-ms-summary": "Page token",
+            "description": "Token returned by a previous page."
+          },
+          {
+            "name": "maxResults",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "uint32",
+            "minimum": 1,
+            "maximum": 20,
+            "x-ms-summary": "Max results",
+            "default": 20
+          },
+          {
+            "name": "includeSpamTrash",
+            "in": "query",
+            "required": false,
+            "type": "boolean",
+            "x-ms-summary": "Include spam/trash",
+            "enum": [
+              false
+            ],
+            "default": false
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Message list.",
+            "schema": {
+              "$ref": "#/definitions/ListMessagesResponse"
+            }
+          }
+        }
+      }
+    },
+    "/users/{userId}/messages/{id}": {
+      "get": {
+        "operationId": "GetMessage",
+        "summary": "Get Gmail message",
+        "description": "Read only for an eligible bounded MFA attempt. Query and mailbox are resolved by trusted configuration.",
+        "x-ms-summary": "Get message",
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "x-ms-summary": "User",
+            "enum": [
+              "me"
+            ],
+            "description": "Only the authenticated mailbox."
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "x-ms-summary": "Message ID"
+          },
+          {
+            "name": "format",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "enum": [
+              "full"
+            ],
+            "x-ms-summary": "Format",
+            "default": "full"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Gmail message.",
+            "schema": {
+              "$ref": "#/definitions/Message"
+            }
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "ListMessagesResponse": {
+      "type": "object",
+      "properties": {
+        "messages": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/MessageReference"
+          }
+        },
+        "nextPageToken": {
+          "type": "string"
+        },
+        "resultSizeEstimate": {
+          "type": "integer",
+          "format": "uint32"
+        }
+      }
+    },
+    "MessageReference": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "threadId": {
+          "type": "string"
+        }
+      }
+    },
+    "Message": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "threadId": {
+          "type": "string"
+        },
+        "labelIds": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "internalDate": {
+          "type": "string"
+        },
+        "sizeEstimate": {
+          "type": "integer"
+        },
+        "payload": {
+          "$ref": "#/definitions/MessagePart"
+        }
+      }
+    },
+    "MessagePart": {
+      "type": "object",
+      "properties": {
+        "partId": {
+          "type": "string"
+        },
+        "mimeType": {
+          "type": "string"
+        },
+        "filename": {
+          "type": "string"
+        },
+        "headers": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Header"
+          }
+        },
+        "body": {
+          "$ref": "#/definitions/MessagePartBody"
+        },
+        "parts": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/MessagePart"
+          }
+        }
+      }
+    },
+    "Header": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "value": {
+          "type": "string"
+        }
+      }
+    },
+    "MessagePartBody": {
+      "type": "object",
+      "properties": {
+        "attachmentId": {
+          "type": "string"
+        },
+        "size": {
+          "type": "integer"
+        },
+        "data": {
+          "type": "string",
+          "description": "Sensitive base64url MIME body. No logs, tracked properties or ordinary artifacts. Parse only inside the controlled sensitive-data path."
+        }
+      }
+    }
+  },
+  "parameters": {},
+  "responses": {},
+  "security": [
+    {
+      "googleOAuth": [
+        "https://www.googleapis.com/auth/gmail.readonly"
+      ]
+    }
+  ],
+  "securityDefinitions": {
+    "googleOAuth": {
+      "type": "oauth2",
+      "flow": "accessCode",
+      "authorizationUrl": "https://accounts.google.com/o/oauth2/auth",
+      "tokenUrl": "https://oauth2.googleapis.com/token",
+      "scopes": {
+        "https://www.googleapis.com/auth/gmail.readonly": "https://www.googleapis.com/auth/gmail.readonly"
+      }
+    }
+  }
+}

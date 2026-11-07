@@ -1,0 +1,152 @@
+{
+  "description": "Original file hashes precede public adaptations. Paths and organization/provider labels are generalized. No private history or message content included.",
+  "files": [
+    {
+      "source": "apps/api/src/provider/gmailTransport.ts",
+      "sourceSha256": "19b73cd481985270f829d3aac6f35d423b54303c169bf265d8a52844c5c8ecb1",
+      "publicFile": "src/gmailTransport.ts",
+      "adaptations": [
+        "Fictional organization/provider labels, filename-variable renaming where present, and explicit import extensions.",
+        "Public execution/reference adaptation described in SOURCE-MAP.md."
+      ]
+    },
+    {
+      "source": "apps/api/src/provider/gmailLookupDiagnostics.ts",
+      "sourceSha256": "29fff42d6f194ed0296dc92104e56ca9f3cbe2655b76150e8c89fb7b5f2b5bce",
+      "publicFile": "src/gmailLookupDiagnostics.ts",
+      "adaptations": [
+        "Fictional organization/provider labels, filename-variable renaming where present, and explicit import extensions."
+      ]
+    },
+    {
+      "source": "apps/api/src/provider/mailbox/candidate-binding.js",
+      "sourceSha256": "ad1150328494ab9612a04ccb4e8fef3cade6b10f5f4f6787e19f29c00b0fec1d",
+      "publicFile": "src/mailbox/candidate-binding.js",
+      "adaptations": [
+        "Fictional organization/provider labels, filename-variable renaming where present, and explicit import extensions."
+      ]
+    },
+    {
+      "source": "apps/api/src/provider/mailbox/mailbox-plan.js",
+      "sourceSha256": "d73a2640d10c91d594f658fd4ae924d2fb64dbc2c4fc651675de86ea5f9ac079",
+      "publicFile": "src/mailbox/mailbox-plan.js",
+      "adaptations": [
+        "Fictional organization/provider labels, filename-variable renaming where present, and explicit import extensions."
+      ]
+    },
+    {
+      "source": "apps/api/src/provider/mailbox/enumerate-mail.js",
+      "sourceSha256": "6a5bf1460db1e3742c2dcade0bc3312301cfc9b562ec7e87d58016e2328c523e",
+      "publicFile": "src/mailbox/enumerate-mail.js",
+      "adaptations": [
+        "Fictional organization/provider labels, filename-variable renaming where present, and explicit import extensions."
+      ]
+    },
+    {
+      "source": "apps/api/src/provider/mailbox/mailbox-candidate.js",
+      "sourceSha256": "c079b28c01c0f9d6bd65a173a6ddef53b988e54ed3a6d4cb97c4bac1825f0885",
+      "publicFile": "src/mailbox/mailbox-candidate.js",
+      "adaptations": [
+        "Fictional organization/provider labels, filename-variable renaming where present, and explicit import extensions."
+      ]
+    },
+    {
+      "source": "apps/api/src/provider/mailbox/seal-candidate.js",
+      "sourceSha256": "32abe6a2c920a7104a0ed7cf732840fc383da469ec9725de8157b3b03c79ef2c",
+      "publicFile": "src/mailbox/seal-candidate.js",
+      "adaptations": [
+        "Fictional organization/provider labels, filename-variable renaming where present, and explicit import extensions."
+      ]
+    },
+    {
+      "source": "docs/plans/provider-mfa-mailbox-20261020/prototype/mailbox-plan.test.mjs",
+      "sourceSha256": "dbc36a44626542fb0288b76b8d80ec1f766d798ecae640fa13c0854e349a33a0",
+      "publicFile": "src/mailbox/mailbox-plan.test.mjs",
+      "adaptations": [
+        "Fictional organization/provider labels, filename-variable renaming where present, and explicit import extensions.",
+        "Public execution/reference adaptation described in SOURCE-MAP.md."
+      ]
+    },
+    {
+      "source": "docs/plans/provider-mfa-mailbox-20261020/prototype/enumerate-mail.test.mjs",
+      "sourceSha256": "0a6fe87dc1406f25ba34639121a0d490970c7fbc422379b470e5cb4644ccbfe1",
+      "publicFile": "src/mailbox/enumerate-mail.test.mjs",
+      "adaptations": [
+        "Fictional organization/provider labels, filename-variable renaming where present, and explicit import extensions.",
+        "Public execution/reference adaptation described in SOURCE-MAP.md."
+      ]
+    },
+    {
+      "source": "apps/api/src/provider/gmailLookup.ts",
+      "sourceSha256": "7d67d84f261efc0eeb9a22b0fa4fa2da4511d30b7f2eef5d8b2504a86c43b9ac",
+      "publicFile": "reference/gmailLookup.ts",
+      "adaptations": [
+        "Fictional organization/provider labels, filename-variable renaming where present, and explicit import extensions."
+      ]
+    },
+    {
+      "source": "apps/api/src/provider/gmailLookupStore.ts",
+      "sourceSha256": "8d048201f4ca183824ba343d1f6da2524258538edd4a9b55bb7d0420d8a453c3",
+      "publicFile": "reference/gmailLookupStore.ts",
+      "adaptations": [
+        "Fictional organization/provider labels, filename-variable renaming where present, and explicit import extensions."
+      ]
+    },
+    {
+      "source": "apps/api/src/provider/gmailMessage.ts",
+      "sourceSha256": "c6e17d4d3e898c2194dec2e3f59b06b2002c2dfb9942b1c3c65b75cd8c355578",
+      "publicFile": "reference/gmailMessage.ts",
+      "adaptations": [
+        "Fictional organization/provider labels, filename-variable renaming where present, and explicit import extensions."
+      ]
+    },
+    {
+      "source": "infra/database/migrations/159_provider_gmail_lookup.sql",
+      "sourceSha256": "c5f6d5aaedaf4f01033d3495992dd36db607fea00fa31852d6835a3817397127",
+      "publicFile": "reference/159-mailbox-claims.sql",
+      "adaptations": [
+        "Fictional organization/provider labels, filename-variable renaming where present, and explicit import extensions."
+      ]
+    },
+    {
+      "source": "infra/modules/provider-mfa-gmail/main.tf",
+      "sourceSha256": "0ac625a3bfe363b0687c776edbef2b18d5f8568b5ed743bdae0600a8c69eb3fe",
+      "publicFile": "infra/connector-history/main.tf",
+      "adaptations": [
+        "Fictional organization/provider labels, filename-variable renaming where present, and explicit import extensions."
+      ]
+    },
+    {
+      "source": "infra/modules/provider-mfa-gmail/variables.tf",
+      "sourceSha256": "37cdb0466ef5de8c247bdd81f9e346a6d2847d0711ada0e35e0eeef08f44eba7",
+      "publicFile": "infra/connector-history/variables.tf",
+      "adaptations": [
+        "Fictional organization/provider labels, filename-variable renaming where present, and explicit import extensions."
+      ]
+    },
+    {
+      "source": "infra/modules/provider-mfa-gmail/outputs.tf",
+      "sourceSha256": "fe17b055c9e5f39374f778b0a5cdf3adc4d87f94cb648828b47c8f2f48e766ec",
+      "publicFile": "infra/connector-history/outputs.tf",
+      "adaptations": [
+        "Fictional organization/provider labels, filename-variable renaming where present, and explicit import extensions."
+      ]
+    },
+    {
+      "source": "infra/modules/provider-mfa-gmail/versions.tf",
+      "sourceSha256": "4b32d93f62b9cb98c94914af896e177237329c4bbb9a5e43ea4db5f0de01086b",
+      "publicFile": "infra/connector-history/versions.tf",
+      "adaptations": [
+        "Fictional organization/provider labels, filename-variable renaming where present, and explicit import extensions."
+      ]
+    },
+    {
+      "source": "infra/modules/provider-mfa-gmail/gmail-mfa.openapi.json",
+      "sourceSha256": "76664ae8415d4b2a4c4e2d9838013fc24160459204a99e2356641adc8f67a33c",
+      "publicFile": "infra/connector-history/gmail-mfa.openapi.json",
+      "adaptations": [
+        "Fictional organization/provider labels, filename-variable renaming where present, and explicit import extensions."
+      ]
+    }
+  ]
+}
