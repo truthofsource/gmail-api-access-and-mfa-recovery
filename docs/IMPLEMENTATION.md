@@ -14,9 +14,9 @@ The complete reference reads a versioned authorization bundle from Key Vault thr
 
 A Google external app left in Testing can have short-lived refresh authorization for Gmail scopes. The original setup moved to In production after completing required branding, then renewed consent. Publishing status is not a substitute for verification, user consent, account checks or organization policy. Confirm applicable Google requirements before commissioning a new app.
 
-## Bounded transport
+## Limits on Gmail requests
 
-Only HTTPS requests to `oauth2.googleapis.com` and `gmail.googleapis.com` are allowed, without alternate ports or URL credentials. Redirects are rejected. HTTP bodies are bounded before JSON parsing, and abort signals carry deadlines. Errors become limited categories such as authorization, throttled or transport; raw provider messages and tokens are not returned as diagnostics.
+Only HTTPS requests to `oauth2.googleapis.com` and `gmail.googleapis.com` are allowed, without alternate ports or URL credentials. Redirects are rejected. Response size is limited before parsing, and each request has a time limit. Errors become limited categories such as authorization, throttled or transport; raw provider messages and tokens are not returned as diagnostics.
 
 The mailbox planner limits each lookup to its request, challenge, send generation, credential version and verified profile. It bounds enumeration to five pages and twenty messages and requires complete discovery before selection. Those limits belong to MFA lookup, not the document-ingestion Logic App's different pagination limits.
 
@@ -26,11 +26,11 @@ The full raw-message verifier checks cryptographic sender evidence, required sig
 
 Multiple eligible messages remain ambiguous, including messages containing the same code. A regular browser sign-in can generate a competing message without an application request ID. The original owner confirmed one provider account per inbox; that does not eliminate overlapping challenges from different browsers.
 
-The full SQL store rechecks the lease, request/challenge/generation, credential and command slot in an atomic transaction. It records a keyed message hash and encrypted command, not plaintext email/code. The worker must verify protected access and persist its new session before Ready. A reused valid session can succeed without a fresh email claim; it is not proof of a new challenge.
+Before saving a command, the database rechecks request ownership, the current challenge, the send attempt, the credential and whether a command is already present. These checks and the save happen in one transaction. It records a keyed message hash and encrypted command, not plaintext email/code. The worker must verify protected access and persist its new session before Ready. A reused valid session can succeed without a fresh email claim; it is not proof of a new challenge.
 
 ## Timestamp precision repair
 
-Gmail can report an arrival at whole-second precision while confirmed Send time includes milliseconds. The repaired comparison allows only the exact second bucket containing Send. An older precise timestamp, previous second, future time or expired request is still rejected by the surrounding checks. This is a precision correction, not a general grace period.
+Gmail can report an arrival at whole-second precision while confirmed Send time includes milliseconds. The corrected comparison accepts an arrival rounded to the same second as the confirmed Send time. An older precise timestamp, previous second, future time or expired request is still rejected by the surrounding checks. This is a precision correction, not a general grace period.
 
 ## Code boundaries
 
