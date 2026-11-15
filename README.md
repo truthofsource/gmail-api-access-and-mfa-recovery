@@ -39,6 +39,19 @@ The Gmail API retrieves a candidate message; it does not by itself complete prov
 
 ## Step by Step
 
+Build an independent version with the [reader-operated walkthrough](docs/BUILD-YOUR-OWN.md). It gives prerequisites, working locations, numbered actions, source-derived commands, expected results, verification and cleanup.
+
+For this project, your working starting point is [`src/mailbox/enumerate-mail.test.mjs`](src/mailbox/enumerate-mail.test.mjs). Expected scope: A local mailbox-selection result without reading Gmail or completing a real reconnect.
+
+1. **Create your own workspace.** Copy the project and record the source version before editing.
+2. **Prepare and run the baseline.** Use the documented runtimes and selected dependencies, then run the local checks.
+3. **Make your own change.** Edit a project-specific fixture, configuration or rule and rerun its positive and negative cases.
+4. **Verify and document your result.** Capture your own evidence and distinguish a local example from a live integration.
+5. **Extend and close out deliberately.** Plan any independent cloud work separately and clean up only what you created.
+
+<details>
+<summary>How the underlying platform process works</summary>
+
 A short walkthrough of the process, with technical instructions and evidence limits in the sections below.
 
 1. **Authorize the intended inbox (Google OAuth 2.0)** — The mailbox owner grants permission through Google. The application stores that authorization securely and confirms the mailbox account before reading.
@@ -48,6 +61,8 @@ A short walkthrough of the process, with technical instructions and evidence lim
 3. **Complete the sign-in securely (Playwright worker)** — The application prevents reuse and protects the code before passing it to the sign-in component. It confirms access to protected provider pages before saving the session.
 
 4. **Use manual help when needed** — An expired or unclear result falls back to manual entry instead of guessing. Reusing an already valid saved sign-in is tracked separately from completing a new email challenge.
+
+</details>
 
 ## Architecture
 
