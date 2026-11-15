@@ -1,0 +1,78 @@
+<?xml version='1.0' encoding='utf-8'?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="1920" viewBox="0 0 1200 1920" role="img" aria-labelledby="title desc">
+<title id="title">Gmail-assisted connection recovery — illustrated architecture</title>
+<desc id="desc">Actual direct API path, independent of the failed connector. Regular browser sign-ins can create competing messages. Direct Gmail access avoided the connector but did not fix document-ingestion commissioning.</desc>
+<defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10z" fill="#586574" /></marker></defs>
+<rect width="1200" height="1920" fill="white" />
+<g font-family="Arial,Helvetica,sans-serif">
+<text x="54" y="36" font-size="12" font-weight="700" letter-spacing="1.8" fill="#617084">PROJECT ARCHITECTURE · ILLUSTRATED OVERVIEW</text>
+<text x="54" y="79" font-size="30" font-weight="700" fill="#172d46">Gmail-assisted connection recovery</text>
+<text x="54" y="110" font-size="16" fill="#526276">Actual direct API path, independent of the failed connector</text>
+<path d="M600.0 336 V370.0 H408.0 V402" fill="none" stroke="#586574" stroke-width="1.7" stroke-linejoin="round" marker-end="url(#arrow)" />
+<path d="M600.0 336 V370.0 H792.0 V402" fill="none" stroke="#586574" stroke-width="1.7" stroke-linejoin="round" marker-end="url(#arrow)" />
+<path d="M408.0 574 V608.0 H600.0 V640" fill="none" stroke="#586574" stroke-width="1.7" stroke-linejoin="round" marker-end="url(#arrow)" />
+<path d="M792.0 574 V608.0 H600.0 V640" fill="none" stroke="#586574" stroke-width="1.7" stroke-linejoin="round" marker-end="url(#arrow)" />
+<path d="M600.0 812 V846.0 H600.0 V878" fill="none" stroke="#586574" stroke-width="1.7" stroke-linejoin="round" marker-end="url(#arrow)" />
+<path d="M600.0 1050 V1084.0 H408.0 V1116" fill="none" stroke="#586574" stroke-width="1.7" stroke-linejoin="round" marker-end="url(#arrow)" />
+<path d="M600.0 1050 V1084.0 H792.0 V1116" fill="none" stroke="#586574" stroke-width="1.7" stroke-linejoin="round" marker-end="url(#arrow)" />
+<path d="M408.0 1288 V1322.0 H600.0 V1354" fill="none" stroke="#586574" stroke-width="1.7" stroke-linejoin="round" marker-end="url(#arrow)" />
+<path d="M792.0 1288 V1322.0 H600.0 V1354" fill="none" stroke="#586574" stroke-width="1.7" stroke-linejoin="round" marker-end="url(#arrow)" />
+<path d="M600.0 1526 V1560.0 H600.0 V1592" fill="none" stroke="#586574" stroke-width="1.7" stroke-linejoin="round" marker-end="url(#arrow)" />
+<g data-node="n0_0"><rect x="425.0" y="166" width="350" height="170" rx="7" fill="#dae8fc" stroke="#6c8ebf" stroke-width="1.5" />
+<svg width="36" height="36" viewBox="0 0 40 40" x="582.0" y="178" data-purpose-icon="n0_0"><rect x="1" y="1" width="38" height="38" rx="8" fill="white" stroke="#315f8a" stroke-opacity="0.3" /><g transform="translate(8 8)" fill="none" stroke="#315f8a" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 7a9 9 0 0 0-15-2L2 8m0-5v5h5m-3 9a9 9 0 0 0 15 2l3-3m0 5v-5h-5" /></g></svg>
+<text x="600.0" y="238" text-anchor="middle" font-size="16" font-weight="700" fill="#20384f">Reconnect request</text>
+<text x="600.0" y="266" text-anchor="middle" font-size="14" fill="#40556b">Starts recovery for one intended service</text>
+<text x="600.0" y="284" text-anchor="middle" font-size="14" fill="#40556b">connection.</text>
+</g>
+<g data-node="n1_0"><rect x="233.0" y="404" width="350" height="170" rx="7" fill="#dae8fc" stroke="#6c8ebf" stroke-width="1.5" />
+<svg width="36" height="36" viewBox="0 0 40 40" x="390.0" y="416" data-purpose-icon="n1_0"><rect x="1" y="1" width="38" height="38" rx="8" fill="white" stroke="#315f8a" stroke-opacity="0.3" /><g transform="translate(8 8)" fill="none" stroke="#315f8a" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="10" cy="10" r="7" /><path d="m15 15 7 7" /></g></svg>
+<text x="408.0" y="476" text-anchor="middle" font-size="16" font-weight="700" fill="#20384f">Functions lookup</text>
+<text x="408.0" y="504" text-anchor="middle" font-size="14" fill="#40556b">Searches the approved inbox within defined</text>
+<text x="408.0" y="522" text-anchor="middle" font-size="14" fill="#40556b">limits.</text>
+</g>
+<g data-node="n1_1"><rect x="617.0" y="404" width="350" height="170" rx="7" fill="#e1d5e7" stroke="#9673a6" stroke-width="1.5" />
+<svg width="36" height="36" viewBox="0 0 40 40" x="774.0" y="416" data-purpose-icon="n1_1"><rect x="1" y="1" width="38" height="38" rx="8" fill="white" stroke="#745386" stroke-opacity="0.3" /><g transform="translate(8 8)" fill="none" stroke="#745386" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="8" r="6" /><path d="m12 12 10 10m-4-4 3-3m-6 0 3-3M6 6h.1" /></g></svg>
+<text x="792.0" y="476" text-anchor="middle" font-size="16" font-weight="700" fill="#20384f">Key Vault authorization</text>
+<text x="792.0" y="504" text-anchor="middle" font-size="14" fill="#40556b">Keeps the mailbox owner's saved</text>
+<text x="792.0" y="522" text-anchor="middle" font-size="14" fill="#40556b">authorization protected.</text>
+</g>
+<g data-node="n2_0"><rect x="425.0" y="642" width="350" height="170" rx="7" fill="#dae8fc" stroke="#6c8ebf" stroke-width="1.5" />
+<svg width="36" height="36" viewBox="0 0 40 40" x="582.0" y="654" data-purpose-icon="n2_0"><rect x="1" y="1" width="38" height="38" rx="8" fill="white" stroke="#315f8a" stroke-opacity="0.3" /><g transform="translate(8 8)" fill="none" stroke="#315f8a" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2" /><path d="m2 5 10 8L22 5" /></g></svg>
+<text x="600.0" y="714" text-anchor="middle" font-size="16" font-weight="700" fill="#20384f">Direct Gmail API</text>
+<text x="600.0" y="742" text-anchor="middle" font-size="14" fill="#40556b">Reads candidate messages from the intended</text>
+<text x="600.0" y="760" text-anchor="middle" font-size="14" fill="#40556b">Gmail inbox.</text>
+</g>
+<g data-node="n3_0"><rect x="425.0" y="880" width="350" height="170" rx="7" fill="#ffe6cc" stroke="#d79b00" stroke-width="1.5" />
+<svg width="36" height="36" viewBox="0 0 40 40" x="582.0" y="892" data-purpose-icon="n3_0"><rect x="1" y="1" width="38" height="38" rx="8" fill="white" stroke="#996e23" stroke-opacity="0.3" /><g transform="translate(8 8)" fill="none" stroke="#996e23" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10" /><path d="M12 6v6l4 3" /></g></svg>
+<text x="600.0" y="952" text-anchor="middle" font-size="16" font-weight="700" fill="#20384f">Message and timing checks</text>
+<text x="600.0" y="980" text-anchor="middle" font-size="14" fill="#40556b">Rejects old, reused or competing</text>
+<text x="600.0" y="998" text-anchor="middle" font-size="14" fill="#40556b">verification codes.</text>
+</g>
+<g data-node="n4_0"><rect x="233.0" y="1118" width="350" height="170" rx="7" fill="#dae8fc" stroke="#6c8ebf" stroke-width="1.5" />
+<svg width="36" height="36" viewBox="0 0 40 40" x="390.0" y="1130" data-purpose-icon="n4_0"><rect x="1" y="1" width="38" height="38" rx="8" fill="white" stroke="#315f8a" stroke-opacity="0.3" /><g transform="translate(8 8)" fill="none" stroke="#315f8a" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="8" r="6" /><path d="m12 12 10 10m-4-4 3-3m-6 0 3-3M6 6h.1" /></g></svg>
+<text x="408.0" y="1190" text-anchor="middle" font-size="16" font-weight="700" fill="#20384f">One suitable message</text>
+<text x="408.0" y="1218" text-anchor="middle" font-size="14" fill="#40556b">Passes a suitable code securely for this</text>
+<text x="408.0" y="1236" text-anchor="middle" font-size="14" fill="#40556b">sign-in attempt.</text>
+</g>
+<g data-node="n4_1"><rect x="617.0" y="1118" width="350" height="170" rx="7" fill="#ffe6cc" stroke="#d79b00" stroke-width="1.5" />
+<svg width="36" height="36" viewBox="0 0 40 40" x="774.0" y="1130" data-purpose-icon="n4_1"><rect x="1" y="1" width="38" height="38" rx="8" fill="white" stroke="#996e23" stroke-opacity="0.3" /><g transform="translate(8 8)" fill="none" stroke="#996e23" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="7" r="5" /><path d="M3 22v-2a9 9 0 0 1 18 0v2" /></g></svg>
+<text x="792.0" y="1190" text-anchor="middle" font-size="16" font-weight="700" fill="#20384f">Uncertain / expired</text>
+<text x="792.0" y="1218" text-anchor="middle" font-size="14" fill="#40556b">Asks a person to enter the code when the</text>
+<text x="792.0" y="1236" text-anchor="middle" font-size="14" fill="#40556b">match is unclear.</text>
+</g>
+<g data-node="n5_0"><rect x="425.0" y="1356" width="350" height="170" rx="7" fill="#dae8fc" stroke="#6c8ebf" stroke-width="1.5" />
+<svg width="36" height="36" viewBox="0 0 40 40" x="582.0" y="1368" data-purpose-icon="n5_0"><rect x="1" y="1" width="38" height="38" rx="8" fill="white" stroke="#315f8a" stroke-opacity="0.3" /><g transform="translate(8 8)" fill="none" stroke="#315f8a" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="18" rx="2" /><path d="M2 8h20M5 5.5h.1M8 5.5h.1M11 5.5h.1" /></g></svg>
+<text x="600.0" y="1428" text-anchor="middle" font-size="16" font-weight="700" fill="#20384f">Playwright provider worker</text>
+<text x="600.0" y="1456" text-anchor="middle" font-size="14" fill="#40556b">Completes the service sign-in and checks</text>
+<text x="600.0" y="1474" text-anchor="middle" font-size="14" fill="#40556b">that it worked.</text>
+</g>
+<g data-node="n6_0"><rect x="425.0" y="1594" width="350" height="170" rx="7" fill="#d5e8d4" stroke="#82b366" stroke-width="1.5" />
+<svg width="36" height="36" viewBox="0 0 40 40" x="582.0" y="1606" data-purpose-icon="n6_0"><rect x="1" y="1" width="38" height="38" rx="8" fill="white" stroke="#527a50" stroke-opacity="0.3" /><g transform="translate(8 8)" fill="none" stroke="#527a50" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="5" rx="1" /><path d="M4 8v14h16V8M9 12h6m-6 4h6" /></g></svg>
+<text x="600.0" y="1666" text-anchor="middle" font-size="16" font-weight="700" fill="#20384f">Saved provider session</text>
+<text x="600.0" y="1694" text-anchor="middle" font-size="14" fill="#40556b">Saves the usable connection and records the</text>
+<text x="600.0" y="1712" text-anchor="middle" font-size="14" fill="#40556b">recovery result.</text>
+</g>
+<line x1="54" y1="1792" x2="1146" y2="1792" stroke="#dce2e9" />
+<text x="54" y="1813" font-size="13" fill="#526276">Regular browser sign-ins can create competing messages. Direct Gmail access avoided the connector but did not fix document-ingestion</text>
+<text x="54" y="1832" font-size="13" fill="#526276">commissioning.</text>
+<text x="54" y="1894" font-size="11.5" fill="#687789">truthofsource/gmail-api-access-and-mfa-recovery · Purpose icons, not vendor logos or completion status</text></g></svg>

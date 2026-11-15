@@ -1,10 +1,12 @@
 # Gmail API Access and Provider MFA Recovery
 
+[![Gmail-assisted connection recovery — illustrated overview](docs/diagrams/architecture.png)](docs/diagrams/architecture.svg)
+
+[View SVG](docs/diagrams/architecture.svg) · [Download PNG](docs/diagrams/architecture.png) · [Edit in draw.io](docs/diagrams/architecture.drawio)
+
 **Help restore a business connection using the right email verification code, with manual help when needed.**
 
 [Business problem](#the-business-problem) · [Solution](#the-solution) · [Conclusions](#why-direct-gmail-access) · [Proof](#proof-it-works) · [Commands](docs/COMMANDS.md) · [Step by step](#step-by-step)
-
-![Gmail access project local reference](docs/images/01-overview.png)
 
 ## The Business Problem
 
@@ -189,7 +191,7 @@ Revoke your lab consent if it will not be used and remove local client/token mat
 | Failure boundary | A meaningful denied, malformed, stale or failed case | Not yet recorded |
 | Recovery / cleanup | What you restored or removed and what remains billed | Not yet recorded |
 
-Capture your own architecture/configuration, one working result and one failure/recovery result. Keep tokens, credentials, personal records and private identifiers out of public screenshots. Existing portfolio images are references, not evidence that you performed these steps.
+Capture your own architecture/configuration, one working result and one failure/recovery result. Keep tokens, credentials, personal records and private identifiers out of public screenshots. The architecture diagram explains the design; record your own results rather than treating it as execution evidence.
 
 ### Troubleshooting order
 
@@ -225,16 +227,7 @@ A short walkthrough of the process, with technical instructions and evidence lim
 
 ## Architecture
 
-```mermaid
-flowchart LR
-  Owner[Owner authorizes the inbox] --> Permission[Store permission securely]
-  Reconnect[Start a reconnect attempt] --> Inbox[Check the intended inbox]
-  Permission --> Inbox
-  Inbox --> Message[Check the message and its timing]
-  Message -->|One suitable message| SignIn[Use the code securely]
-  SignIn --> Confirm[Confirm access and save the sign-in]
-  Message -->|Unclear or expired| Manual[Ask for manual entry]
-```
+[View the illustrated project overview](docs/diagrams/architecture.svg).
 
 ## What Was Built
 
@@ -270,11 +263,7 @@ npm run demo
 
 **Observed: 27 local code tests passed, with zero failures.** Tests use fake HTTP responses and fictional messages. They exercise actual transport and helper code without using a real Google account. These local tests do not repeat live Google consent, email-authenticity checks, database writes or browser sign-in.
 
-![Fictional local Gmail selection outcomes](docs/images/02-local-checks.png)
-
 ### 2. Review the difficult cases
-
-![Connector and recovery conclusions](docs/images/03-conclusions.png)
 
 Multiple fresh messages remain ambiguous, even when their codes match. Regular browser sign-ins can create competing emails. The code does not guess which one belongs to the worker.
 
