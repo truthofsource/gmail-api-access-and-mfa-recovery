@@ -39,7 +39,7 @@ The Gmail API retrieves a candidate message; it does not by itself complete prov
 
 ## Step by Step
 
-Build an independent version with the [reader-operated walkthrough](docs/BUILD-YOUR-OWN.md). It gives prerequisites, working locations, numbered actions, source-derived commands, expected results, verification and cleanup.
+Build an independent version with the [step-by-step build guide](docs/BUILD-YOUR-OWN.md). It gives prerequisites, working locations, numbered actions, source-derived commands, expected results, verification and cleanup.
 
 For this project, your working starting point is [`src/mailbox/enumerate-mail.test.mjs`](src/mailbox/enumerate-mail.test.mjs). Expected scope: A local mailbox-selection result without reading Gmail or completing a real reconnect.
 
