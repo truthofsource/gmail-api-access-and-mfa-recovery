@@ -123,19 +123,27 @@ python3 -m venv .venv
 
 **Where:** Your project folder.
 
-Create reader.py below. The first authorization is interactive; the sample does not save a refresh token or print a message body/code.
+Create reader.py below and privately configure EXPECTED_GMAIL_ADDRESS to the primary address of your intended test inbox before running it. The profile check happens before listing messages; the script saves no refresh token and prints neither the address nor a message body/code.
 
 Create **`reader.py`** with the following contents:
 
 ```python
+import os
 from google_auth_oauthlib.flow import InstalledAppFlow
 from googleapiclient.discovery import build
+expected = os.environ.get('EXPECTED_GMAIL_ADDRESS', '').strip()
+if not expected or '@' not in expected:
+    raise ValueError('Set the intended primary Gmail address privately before authorizing')
 SCOPES = ['https://www.googleapis.com/auth/gmail.readonly']
 flow = InstalledAppFlow.from_client_secrets_file('credentials.json', SCOPES)
 credentials = flow.run_local_server(port=0)
 gmail = build('gmail', 'v1', credentials=credentials)
+profile = gmail.users().getProfile(userId='me').execute()
+actual = profile.get('emailAddress') if isinstance(profile, dict) else None
+if not isinstance(actual, str) or actual.casefold() != expected.casefold():
+    raise RuntimeError('Authorized mailbox does not match the intended primary account; no messages were read')
 result = gmail.users().messages().list(userId='me', q='newer_than:1d', maxResults=5).execute()
-print({'returned_messages': len(result.get('messages', []))})
+print({'mailbox_verified': True, 'returned_messages': len(result.get('messages', []))})
 ```
 
 **Check before continuing:** The code asks only for Gmail read access and reports a bounded message count.
@@ -144,11 +152,15 @@ print({'returned_messages': len(result.get('messages', []))})
 
 **Where:** Your terminal and regular browser.
 
-Run reader.py, authorize the intended test inbox and verify the bounded count. Do not paste the callback URL, token or a verification code into screenshots or a repository.
+Authorize the intended test inbox in your regular browser and confirm mailbox_verified is true. If the primary account does not match, stop and revoke any unintended consent through that Google account's connected applications before retrying; do not change the expected address just to bypass the mismatch.
 
 ```bash
+read -r -p 'Expected primary Gmail address: ' EXPECTED_GMAIL_ADDRESS
+export EXPECTED_GMAIL_ADDRESS
 .venv/bin/python reader.py
 ```
+
+Enter the intended account's primary address at the private prompt; this avoids putting its literal value into the command history. An alias can differ from the primary profile address. Keep the terminal and callback URLs out of public screenshots.
 
 **Check before continuing:** Your own OAuth client can read the intended account.
 
@@ -192,6 +204,7 @@ The numbered steps describe a build procedure. Local syntax checks, an accepted 
 
 - [developers.google.com — python](https://developers.google.com/workspace/gmail/api/quickstart/python)
 - [developers.google.com — oauth2](https://developers.google.com/identity/protocols/oauth2)
+- [developers.google.com — getProfile](https://developers.google.com/workspace/gmail/api/reference/rest/v1/users/getProfile)
 
 The walkthrough layout follows the prerequisites → creation/configuration → test → verification → troubleshooting → cleanup pattern of the [Splunk project reference](https://github.com/davidharris6/splunk-siem-log-analysis). Its Splunk-specific settings are not copied into unrelated projects.
 
