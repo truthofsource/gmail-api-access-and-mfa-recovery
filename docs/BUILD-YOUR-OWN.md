@@ -1,104 +1,155 @@
-# Build your own: Gmail API Access and Provider MFA Recovery
+# Build your own from scratch: Gmail Api Access And Mfa Recovery
 
-This is a step-by-step build guide for an independent learning copy. Follow the numbered steps in order and record your own results. The included local implementation is not a complete deployment of the private business platform; cloud extensions are separate and must use your own authorized resources.
+Your own read-only Gmail OAuth application and a message-selection check that does not expose verification codes.
 
-## What you will create
+Start with a new folder, your own files and your own accounts. The numbered steps below describe the build; no portfolio repository checkout is required. The existing implementation/evidence elsewhere in this repository is a separate reference, not a claim that your new build has already passed.
 
-A local mailbox-selection result without reading Gmail or completing a real reconnect.
+## Prerequisites
 
-## Prerequisites and working locations
+A Google Cloud project you control, a test Gmail inbox, Python and permission to configure OAuth consent. This first build reads message metadata only; it does not automatically submit an MFA code or sign in to another service.
 
-| Location | What you need |
-| --- | --- |
-| Your workstation | Git and the runtime versions documented in [the command guide](COMMANDS.md); use its package/lockfile instructions. |
-| Bash, Linux or WSL terminal | The commands below use Bash syntax. Prepare the compatible Node.js version documented by the project; use the project's pinned dependency files. |
-| PowerShell alternative | Use the PowerShell forms in the command guide, or run this Bash recipe in WSL; do not paste Bash loops into PowerShell. |
-| Azure or external service | Not needed for default local tests. Any cloud extension requires your own account, target, permissions, budget and acceptance plan. |
+Use Bash on Linux/macOS/WSL for Bash blocks and PowerShell for PowerShell blocks. Select the tool versions supported by the official sources below, record the versions you actually install and retain generated dependency locks. Cloud resources, scanner downloads, logs and external AI calls can create costs; review the stated scope before enabling them.
 
-Read [the existing validation scope](VALIDATION.md) before running anything. A recorded historical test result is not evidence that your new copy has passed.
+## Create your project folder
 
-## Step 1: Create your own workspace
-
-**Where:** your workstation, in a new project folder.
-
-1. Clone the public source below into a new directory; keep the source attribution and included license terms. This creates your local learning copy, not cloud resources.
-2. Record the selected commit and tool versions before editing. If you later publish a fork, review any origin, hash or target bindings rather than disabling guards to make the fork pass.
+Choose a new folder name. These first commands create a blank project; an optional `git init` gives it its own history. Create parent directories in your editor when a later step introduces a nested file.
 
 ```bash
-git clone https://github.com/truthofsource/gmail-api-access-and-mfa-recovery.git
-cd gmail-api-access-and-mfa-recovery
-git rev-parse HEAD
-git rev-parse --show-toplevel
-git status --short
+mkdir my-gmail-api-access-and-mfa-recovery
+cd my-gmail-api-access-and-mfa-recovery
+git init
 ```
 
-**Expected result:** the project files are present and you can identify the starting source. Continue from this repository root unless a command explicitly changes directory.
+Create `.gitignore` before saving credentials or build outputs:
 
-## Step 2: Prepare dependencies and build the local baseline
+```gitignore
+.venv/
+node_modules/
+.env
+.env.*
+local.settings.json
+credentials.json
+token.json
+*.pem
+*.key
+*.tfstate*
+*.tfplan
+.terraform/
+private*/
+captures/
+backups/
+batch.json
+reports/
+out/
+app-config.local.yaml
+```
 
-**Where:** the same workstation terminal.
+The source/file snippets are a starting implementation you type or paste into the named files. Replace `YOUR_*`, names, regions and addresses only with values from your own lab; do not place real client/employee records in a test project. Keep your terminal in this project root unless a step explicitly changes directory.
 
-1. Follow the runtime instructions and install only the dependencies selected by this project's files. Terraform provider downloads, optional browser downloads and scanner databases are separate prerequisites where the detailed guide identifies them.
-2. Run these source-derived baseline commands one at a time and stop on an unexpected failure. Read any skipped integration cases; a skip is not a successful live check.
+Before a first commit, set your own repository-local author with `git config user.name "YOUR_NAME"` and `git config user.email "YOUR_PUBLIC_COMMIT_EMAIL"`. Review `git status --short` and the staged diff before publishing; ignored local files are not a substitute for reviewing what you upload.
+
+## Step 1 — Enable your own API and consent application
+
+**Where:** Google Cloud Console → APIs & Services; Google Auth Platform.
+
+Enable Gmail API in your project. Configure the consent app's branding/audience and authorized test user, choosing the actual mailbox you intend to read; publishing/verification and refresh-token behavior must be reviewed before unattended use.
+
+**Check before continuing:** The project has Gmail API enabled and the intended user may consent.
+
+## Step 2 — Create a desktop OAuth client
+
+**Where:** Google Auth Platform → Clients.
+
+Create a Desktop app client and download its client configuration privately as credentials.json. Keep it outside Git and use a regular browser for consent; do not reuse the portfolio project's client IDs or secrets.
+
+**Check before continuing:** Your own desktop client file is available privately.
+
+## Step 3 — Install your reader dependencies
+
+**Where:** Your new project folder.
+
+Create a virtual environment and install the Google API/OAuth libraries. Record the resolved dependencies in a lock file for your own implementation.
 
 ```bash
-npm test
-npm run demo
+python3 -m venv .venv
+.venv/bin/python -m pip install google-api-python-client google-auth-oauthlib
+.venv/bin/python -m pip freeze > requirements.lock.txt
 ```
 
-**Expected result:** the selected tests finish without unexpected failures, and a demonstration command, where provided, produces fictional local decisions. These commands reproduce the included lab scope; they do not commission the live platform.
+**Check before continuing:** The selected interpreter can import the API and OAuth helpers.
 
-## Step 3: Make one project-specific change
+## Step 4 — Write the first read-only call
 
-**Where:** your editor, in your own local copy.
+**Where:** Your project folder.
 
-1. Start with [`src/mailbox/enumerate-mail.test.mjs`](../src/mailbox/enumerate-mail.test.mjs) and the matching test or configuration instructions. Add two competing fictional messages and verify the flow refuses an ambiguous code selection.
-2. Save your new case separately from the original acceptance records, then rerun the affected tests and the baseline. Do not edit recorded scanner results, screenshots or validation counts to manufacture a successful outcome.
+Create reader.py below. The first authorization is interactive; the sample does not save a refresh token or print a message body/code.
 
-**Expected result:** you can explain what you changed, why the result changed and which negative case still fails safely. An unexpected failure means investigate the implementation or setup, not remove the failing check.
+Create **`reader.py`** with the following contents:
 
-## Step 4: Verify behavior and capture your own evidence
+```python
+from google_auth_oauthlib.flow import InstalledAppFlow
+from googleapiclient.discovery import build
+SCOPES = ['https://www.googleapis.com/auth/gmail.readonly']
+flow = InstalledAppFlow.from_client_secrets_file('credentials.json', SCOPES)
+credentials = flow.run_local_server(port=0)
+gmail = build('gmail', 'v1', credentials=credentials)
+result = gmail.users().messages().list(userId='me', q='newer_than:1d', maxResults=5).execute()
+print({'returned_messages': len(result.get('messages', []))})
+```
 
-**Where:** the test output, local viewer where supplied, and your private evidence folder.
+**Check before continuing:** The code asks only for Gmail read access and reports a bounded message count.
 
-1. If the project supplies a viewer, use its startup command in [the command guide](COMMANDS.md); keep long-running preview servers in a separate terminal. Follow its exact loopback address and stop it with Ctrl+C when finished; for a command-line-only example, inspect its terminal output and generated files instead.
-2. Compare your own output with [the proof and limits](../README.md#proof-it-works), then record source version, command, expected result, observed result and unresolved work. Capture screenshots of your own fictional output rather than presenting the existing screenshots as your execution.
+## Step 5 — Authorize and verify the exact mailbox
 
-**Expected result:** A local mailbox-selection result without reading Gmail or completing a real reconnect. Your evidence must say whether it covers local logic, a real tool run, a hosted service or a human observation.
+**Where:** Your terminal and regular browser.
 
-### Start the local preview
-
-Open a second terminal in the same repository root printed by `git rev-parse --show-toplevel`. Run the command below from that root, after the baseline has passed; it stays running while you use the preview.
+Run reader.py, authorize the intended test inbox and verify the bounded count. Do not paste the callback URL, token or a verification code into screenshots or a repository.
 
 ```bash
-python3 -B scripts/preview.py --port 8141
+.venv/bin/python reader.py
 ```
 
-Open [http://127.0.0.1:8141](http://127.0.0.1:8141). Use the exact hostname shown here; a localhost address and a 127.0.0.1 address are not interchangeable for every project's host checks.
+**Check before continuing:** Your own OAuth client can read the intended account.
 
-The command uses the same Python environment as the baseline where Python is required. This guide uses an explicit virtual-environment executable rather than activating it; when following other project examples that say `python`, use that same executable if the project has a `.venv`. In WSL, keep the clone and its virtual environment in the same Linux environment; do not reuse a Windows `.venv`.
+## Step 6 — Design MFA selection and fallback
 
-Keep one preview per listening port. Stop your own earlier preview with Ctrl+C before starting another one on that port, or use only a port override documented by the project. If you stop the preview, rerun only its startup command; you do not need to rebuild or redeploy cloud services.
+**Where:** Your own protected adapter.
 
-## Step 5: Plan an independent cloud extension, if needed
+Before using messages for recovery, bind the mailbox to one provider account and match sender authentication, recipient, request time and template; reject ambiguous candidates and regular-browser sign-in codes. Store refresh credentials in a protected vault, serialize reconnect attempts and retain manual fallback rather than repeatedly requesting paid/provider operations.
 
-**Where:** your own architecture/configuration files first; a separately authorized lab subscription only later.
+**Check before continuing:** Automatic recovery has an explicit identity/time contract and remains disabled until that separate flow is accepted.
 
-1. Read the implementation and infrastructure references linked below. Substitute your own names, identities, address ranges and service settings in an isolated environment; a public reference may contain only selected components and is not authority to apply someone else's production state.
-2. List the missing integrations and acceptance checks before deployment: runtime hosting, permissions, network/DNS paths, secrets, source data, notification or provider access as applicable. Keep disabled examples disabled until their specific dependencies, costs and cleanup are understood.
+## Step 7 — Remove access when finished
 
-**Expected result:** a scoped extension plan with owners and explicit acceptance criteria, not a claim that the full service is deployed. No cloud `apply`, scanner targeting, paid operation or provider sign-in is implied by the local recipe.
+**Where:** Google account → Security → connected applications.
 
-- [Implementation](IMPLEMENTATION.md)
-- [Operations And Scaling](OPERATIONS-AND-SCALING.md)
-- [Validation](VALIDATION.md)
-- [Source Map](SOURCE-MAP.md)
+Revoke your lab consent if it will not be used and remove local client/token material under your retention policy. Retain only a value-free diagram and evidence of the read-only request.
 
-## Step 6: Troubleshoot, close out and explain what you built
+**Check before continuing:** No mailbox credential or code is published.
 
-**Where:** your project folder and the operating guide for any environment you actually created.
+## Verification and your own screenshots
 
-1. Check the failing stage in order: working directory and runtime, dependencies, test input, configuration, then any separately enabled service. Preserve the error and consult the existing troubleshooting lessons before widening permissions or changing the target.
-2. Stop only the viewers/containers you started, retain your useful evidence and remove only resources belonging to your own reviewed lab. A local-only run needs no cloud deletion; if you created cloud resources, verify residual storage/address/monitoring charges rather than assuming compute stop removes all cost.
+| Evidence | What to record | Your result |
+| --- | --- | --- |
+| New build | Your own files/resource settings and tool versions | Not yet recorded |
+| Working path | The actual successful request, configuration or recovery result | Not yet recorded |
+| Failure boundary | A meaningful denied, malformed, stale or failed case | Not yet recorded |
+| Recovery / cleanup | What you restored or removed and what remains billed | Not yet recorded |
 
-**Finish checklist:** explain the business problem, show your own change and verification, describe one failure/recovery case, identify limitations and name the next owner action. Keep credentials and business records out of public commits and screenshots.
+Capture your own architecture/configuration, one working result and one failure/recovery result. Keep tokens, credentials, personal records and private identifiers out of public screenshots. Existing portfolio images are references, not evidence that you performed these steps.
+
+## Troubleshooting order
+
+1. Confirm the named file, working directory and selected tool/interpreter.
+2. Check the exact input and resource/account selected for the failing step.
+3. Separate identity permission, network/DNS reachability and application validation.
+4. Keep the actual error and reconcile an unknown write outcome before repeating it; do not widen access or repeat paid operations blindly.
+
+The numbered steps describe a build procedure. Local syntax checks, an accepted API request, a completed hosted operation and a human verification are different evidence levels; fill in the verification table with what you actually observed.
+
+## Official implementation references
+
+- [developers.google.com — python](https://developers.google.com/workspace/gmail/api/quickstart/python)
+- [developers.google.com — oauth2](https://developers.google.com/identity/protocols/oauth2)
+
+The walkthrough layout follows the prerequisites → creation/configuration → test → verification → troubleshooting → cleanup pattern of the [Splunk project reference](https://github.com/davidharris6/splunk-siem-log-analysis). Its Splunk-specific settings are not copied into unrelated projects.
